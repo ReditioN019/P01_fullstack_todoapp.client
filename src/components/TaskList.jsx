@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteTaskAPI, getTasksAPI, addTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
 import { compareDate, dateFormat } from '../helpers/dateTimes';
@@ -12,75 +12,66 @@ import { Container } from '@mui/system';
 
 import { CgMathPlus } from 'react-icons/cg';
 import { FaTrash } from 'react-icons/fa';
-import { BsCheckLg, BsFillClockFill, BsXCircleFill, BsTrash2Fill, BsPencilSquare } from 'react-icons/bs';
+import { BsCheckLg, BsFillClockFill, BsXCircleFill, BsPencilSquare } from 'react-icons/bs';
 import { modalStyles } from '../styles/styles';
+import { changeEditCreate, changeOpenModal } from '../store/features/tasks/taskSlice';
 
 
 export const TaskList = () => {
 
     const { handleChange, handleReset, inputs, setInputs } = useForm({
         id: '',
+        title: '',
         description: '',
         expirationDate: null,
     });
-    const { description, expirationDate } = inputs;
+    const { title, description, expirationDate } = inputs;
 
     //Accedo a tasks del store, que a su vez, es el initialState
-    const { tasks } = useSelector(state => state.tasks);
+    const { tasks, openModal, inEdit } = useSelector(state => state.tasks);
     const dispatch = useDispatch();
 
-    const [open, setOpen] = useState(false);
+
 
     useEffect(() => {
         dispatch(getTasksAPI()); //! carga inicial de las tareas de la BD
     }, [])
 
     const handleAddTask = () => {
-
         dispatch(addTaskAPI({
             ...inputs,
             expirationDate: dateFormat(expirationDate)
         }))
+        dispatch(changeOpenModal(!openModal))
 
-        handleReset();
-        setOpen(!open)
     }
-    
 
     const handleUpdateTask = () => {
-
         dispatch(updateTaskApi({
             ...inputs,
             expirationDate: dateFormat(expirationDate)
         }))
-
-        handleReset();
-        setOpen(!open)
+        dispatch(changeOpenModal(!openModal))
     }
 
     const handleDeleteTask = (task) => dispatch(deleteTaskAPI(task))
 
 
-    
-    const [edit, setEdit] = useState(false);
+    const handleOpenModal = (isNewTask, task) => {
 
-    const handleOpenModal = (aux, task) => {
-
-        if (aux) setEdit(false)
-        
-        else { //!Entra aquí en edición
-            setEdit(true);
+        if (isNewTask) {
+            handleReset();
+            dispatch(changeEditCreate(false))
+        }
+        else {//edición
             setInputs({ ...task })
-            setOpen(!open)
-        }     
+            dispatch(changeEditCreate(true))
+        }
+
+        dispatch(changeOpenModal(!openModal))
     }
 
-
-
-
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
-
 
     return (
         <Container maxWidth="md">
@@ -88,8 +79,8 @@ export const TaskList = () => {
                 <h1>Cosas por Hacer</h1>
 
                 <Modal
-                    open={open}
-                    onClose={() => setOpen(false)}
+                    open={openModal}
+                    onClose={() => dispatch(changeOpenModal(!openModal))}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
@@ -99,6 +90,22 @@ export const TaskList = () => {
                                 fullWidth
                                 id="standard-basic"
                                 margin="dense"
+                                label="Titulo"
+                                variant="standard"
+                                name="title"
+                                type="text"
+                                onChange={handleChange}
+                                value={title}
+                                sx={{ marginTop: 1 }}
+                            />
+                        </Typography>
+
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            <TextField
+                                fullWidth
+                                multiline
+                                id="outlined-multiline-static"
+                                margin="dense"
                                 label="Descripción"
                                 variant="standard"
                                 name="description"
@@ -106,6 +113,7 @@ export const TaskList = () => {
                                 onChange={handleChange}
                                 value={description}
                                 sx={{ marginTop: 1 }}
+                                rows={2}
                             />
                         </Typography>
                         <DateTimePicker
@@ -124,15 +132,15 @@ export const TaskList = () => {
                             }
                         />
                         <div style={{ marginTop: '2rem' }}>
-                            <Button 
-                                onClick={() => setOpen(!open)}
-                            
+                            <Button
+                                onClick={() => dispatch(changeOpenModal(!openModal))}
+
                             >Cancelar</Button>
-                            
-                            <Button 
-                            onClick={ edit ? handleUpdateTask : handleAddTask} 
-                            variant="contained" 
-                            color="success"
+
+                            <Button
+                                onClick={inEdit ? handleUpdateTask : handleAddTask}
+                                variant="contained"
+                                color="success"
                             >
                                 Guardar
                             </Button>
@@ -146,12 +154,12 @@ export const TaskList = () => {
 
             {/* ----- CREAR UNA NUEVA TAREA ---- */}
             <Card sx={{ minWidth: 275, maring: "mx-auto", cursor: "pointer", marginTop: '2rem' }}>
-                
-                <Button 
-                fullWidth={true} 
-                style={{ border: "none", padding: 0, background: "none", width: '100%' }} 
-                variant="outlined" 
-                onClick={() => setOpen(true)}
+
+                <Button
+                    fullWidth={true}
+                    style={{ border: "none", padding: 0, background: "none", width: '100%' }}
+                    variant="outlined"
+                    onClick={() => handleOpenModal(true, null)}
                 >
                     <center>
                         <CardContent>
@@ -173,7 +181,11 @@ export const TaskList = () => {
                             <Checkbox {...label} />
 
                             <Typography variant="body2">
-                                <b>{task.description}</b>
+                                <b>{task.title}</b>
+                            </Typography>
+
+                            <Typography variant="body2">
+                                {task.description}
                             </Typography>
 
                             <DateTimePicker
@@ -224,13 +236,13 @@ export const TaskList = () => {
                         <CardActions>
 
                             <FaTrash
-                                style={{cursor: 'pointer', color: '#1976d2'}}
-                                onClick={() => handleDeleteTask(task)} 
+                                style={{ cursor: 'pointer', color: '#1976d2' }}
+                                onClick={() => handleDeleteTask(task)}
                                 size={"2rem"}
                             />
 
-                            <BsPencilSquare 
-                                style={{cursor: 'pointer', color: '#1976d2'}}
+                            <BsPencilSquare
+                                style={{ cursor: 'pointer', color: '#1976d2' }}
                                 size={"2rem"}
                                 onClick={() => handleOpenModal(false, task)}
                             />
