@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { getTasks, addTask, deleteTask, updateTask } from "./taskSlice"
 
-
 export const getTasksAPI = () => {
     return async( dispatch, getState ) => {
         
@@ -25,7 +24,6 @@ export const addTaskAPI = (newTask) => {
     }
 }
 
-
 export const updateTaskApi = (task) => {
     return async(dispatch, getState) => {
 
@@ -41,11 +39,14 @@ export const updateTaskApi = (task) => {
     }
 }
 
-
 export const deleteTaskAPI = (task) => {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
 
-        await axios.delete(`http://localhost:3000/api/tasks/${task.id}`)
-            .then((response) => dispatch(deleteTask(task.id)));
+        task.forEach( async (item) => {
+            await axios.delete(`http://localhost:3000/api/tasks/${item.id}`)
+                .then((response) => dispatch(deleteTask(item.id)));
+        })
+        
+        
     }
 }

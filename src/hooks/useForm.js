@@ -12,7 +12,7 @@ export const useForm = (initialState = {}) => {
         let dataInput = new RegExp(/^[A-Za-z0-9\s]+$/g);
         let res = dataInput.test(value)
         
-        if ((res || value === '') && value.length < 20) {
+        if ((res || value === '') /*&& value.length < 80*/) {
             setInputs( state => ({
                 ...state,
                 [name]: value

@@ -1,21 +1,16 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
-import { deleteTaskAPI, getTasksAPI, addTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
-import { compareDate, dateFormat } from '../helpers/dateTimes';
+import { deleteTaskAPI, getTasksAPI } from '../store/features/tasks/thunks';
 import { useForm } from '../hooks/useForm';
+import { changeEditCreate, changeOpenModal } from '../store/features/tasks/taskSlice';
+import { TaskModal } from './TaskModal';
+import { TaskItem } from './TaskItem';
 
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import { Box, Card, CardActions, CardContent, Checkbox, Modal, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 
-import { CgMathPlus } from 'react-icons/cg';
+import { AiFillFileAdd } from 'react-icons/ai';
 import { FaTrash } from 'react-icons/fa';
-import { BsCheckLg, BsFillClockFill, BsXCircleFill, BsPencilSquare } from 'react-icons/bs';
-import { modalStyles } from '../styles/styles';
-import { changeEditCreate, changeOpenModal } from '../store/features/tasks/taskSlice';
-
 
 export const TaskList = () => {
 
@@ -25,41 +20,20 @@ export const TaskList = () => {
         description: '',
         expirationDate: null,
     });
-    const { title, description, expirationDate } = inputs;
 
     //Accedo a tasks del store, que a su vez, es el initialState
-    const { tasks, openModal, inEdit } = useSelector(state => state.tasks);
+    const { tasks, openModal, tasksSelected } = useSelector(state => state.tasks);
     const dispatch = useDispatch();
 
-
-
     useEffect(() => {
-        dispatch(getTasksAPI()); //! carga inicial de las tareas de la BD
+        dispatch(getTasksAPI());
     }, [])
 
-    const handleAddTask = () => {
-        dispatch(addTaskAPI({
-            ...inputs,
-            expirationDate: dateFormat(expirationDate)
-        }))
-        dispatch(changeOpenModal(!openModal))
+    const handleDeleteTask = () => dispatch(deleteTaskAPI(tasksSelected))
 
-    }
+    const handleOpenModal = (task) => {
 
-    const handleUpdateTask = () => {
-        dispatch(updateTaskApi({
-            ...inputs,
-            expirationDate: dateFormat(expirationDate)
-        }))
-        dispatch(changeOpenModal(!openModal))
-    }
-
-    const handleDeleteTask = (task) => dispatch(deleteTaskAPI(task))
-
-
-    const handleOpenModal = (isNewTask, task) => {
-
-        if (isNewTask) {
+        if (!task) {
             handleReset();
             dispatch(changeEditCreate(false))
         }
@@ -71,190 +45,55 @@ export const TaskList = () => {
         dispatch(changeOpenModal(!openModal))
     }
 
-    const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
     return (
         <Container maxWidth="md">
             <header>
                 <h1>Cosas por Hacer</h1>
-
-                <Modal
-                    open={openModal}
-                    onClose={() => dispatch(changeOpenModal(!openModal))}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={modalStyles}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            <TextField
-                                fullWidth
-                                id="standard-basic"
-                                margin="dense"
-                                label="Titulo"
-                                variant="standard"
-                                name="title"
-                                type="text"
-                                onChange={handleChange}
-                                value={title}
-                                sx={{ marginTop: 1 }}
-                            />
-                        </Typography>
-
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            <TextField
-                                fullWidth
-                                multiline
-                                id="outlined-multiline-static"
-                                margin="dense"
-                                label="Descripción"
-                                variant="standard"
-                                name="description"
-                                type="text"
-                                onChange={handleChange}
-                                value={description}
-                                sx={{ marginTop: 1 }}
-                                rows={2}
-                            />
-                        </Typography>
-                        <DateTimePicker
-                            label="Fecha de expiración"
-                            value={expirationDate}
-                            onChange={(value) => setInputs(tasks => ({ ...tasks, expirationDate: value }))}
-                            minDate={new Date()}
-                            ampm={false}
-                            renderInput={(params) =>
-                                <TextField
-                                    fullWidth
-                                    type="datetime"
-                                    sx={{ marginTop: 3 }}
-                                    {...params}
-                                />
-                            }
-                        />
-                        <div style={{ marginTop: '2rem' }}>
-                            <Button
-                                onClick={() => dispatch(changeOpenModal(!openModal))}
-
-                            >Cancelar</Button>
-
-                            <Button
-                                onClick={inEdit ? handleUpdateTask : handleAddTask}
-                                variant="contained"
-                                color="success"
-                            >
-                                Guardar
-                            </Button>
-                        </div>
-
-                    </Box>
-                </Modal>
-
+                <p>
+                    Primero preguntar si está seguro de borrar. <br />
+                    Finalmente, poner un boton de restaurar (las tareas borradas se guardan al localstorage)
+                </p>
             </header>
 
+            <Button
+                variant="outlined"
+                onClick={() => handleOpenModal(null)}
+            >
+                Crear tarea
+                <AiFillFileAdd
+                    size={20}
+                    style={{ marginLeft: "1rem" }}
+                />
+            </Button>
 
-            {/* ----- CREAR UNA NUEVA TAREA ---- */}
-            <Card sx={{ minWidth: 275, maring: "mx-auto", cursor: "pointer", marginTop: '2rem' }}>
-
-                <Button
-                    fullWidth={true}
-                    style={{ border: "none", padding: 0, background: "none", width: '100%' }}
-                    variant="outlined"
-                    onClick={() => handleOpenModal(true, null)}
-                >
-                    <center>
-                        <CardContent>
-                            <CgMathPlus size={50} />
-                        </CardContent>
-                    </center>
-                </Button>
-            </Card>
-
+            <Button
+                variant="outlined"
+                onClick={() => handleDeleteTask()}
+            >
+                Limpiar Seleccionados
+                <FaTrash
+                    size={20}
+                    style={{ marginLeft: "1rem" }}
+                />
+            </Button>
 
             {
                 tasks.map(task => (
-                    <Card
+                    <TaskItem
                         key={task.id}
-                        sx={{ minWidth: 275, marginTop: '2rem' }}
-                    >
-                        <CardContent>
-
-                            <Checkbox {...label} />
-
-                            <Typography variant="body2">
-                                <b>{task.title}</b>
-                            </Typography>
-
-                            <Typography variant="body2">
-                                {task.description}
-                            </Typography>
-
-                            <DateTimePicker
-                                label="Fecha de creación"
-                                readOnly
-                                value={task.createdAt}
-                                onChange={(value) => setExpirationDate(value)}
-                                minDate={new Date()}
-                                ampm={false}
-                                renderInput={(params) =>
-                                    <TextField
-                                        type="date"
-                                        sx={{ marginTop: 3 }}
-                                        {...params}
-                                    />
-                                }
-                            />
-                            <DateTimePicker
-                                label="Fecha de expiración"
-                                readOnly
-                                value={task.expirationDate}
-                                onChange={(value) => setExpirationDate(value)}
-                                minDate={new Date()}
-                                ampm={false}
-                                renderInput={(params) =>
-                                    <TextField
-                                        type="date"
-                                        sx={{ marginTop: 3 }}
-                                        {...params}
-                                    />
-                                }
-                            />
-
-                            {
-                                compareDate(task.createdAt, task.expirationDate) <= 0 ?
-
-                                    <BsXCircleFill size={40} color={"red"} /> :
-
-                                    (compareDate(task.createdAt, task.expirationDate) > 0 && compareDate(task.createdAt, task.expirationDate) <= 3) ?
-
-                                        <BsFillClockFill size={40} color={"orange"} /> :
-
-                                        <BsCheckLg size={40} color={"green"} />
-                            }
-
-
-                        </CardContent>
-                        <CardActions>
-
-                            <FaTrash
-                                style={{ cursor: 'pointer', color: '#1976d2' }}
-                                onClick={() => handleDeleteTask(task)}
-                                size={"2rem"}
-                            />
-
-                            <BsPencilSquare
-                                style={{ cursor: 'pointer', color: '#1976d2' }}
-                                size={"2rem"}
-                                onClick={() => handleOpenModal(false, task)}
-                            />
-
-                        </CardActions>
-
-                    </Card>
+                        task={task}
+                        handleOpenModal={handleOpenModal}
+                    />
                 ))
             }
 
 
 
+            <TaskModal
+                handleChange={handleChange}
+                inputs={inputs}
+                setInputs={setInputs}
+            />
         </Container>
     )
 }
