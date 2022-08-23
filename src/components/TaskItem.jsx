@@ -1,22 +1,37 @@
 import { useDispatch } from 'react-redux'
-import { Card, CardActions, CardContent, Checkbox, Grid, TextField, Typography } from '@mui/material'
+import { Card, Checkbox, FormControlLabel, Grid, IconButton, Switch, TextField, Tooltip, Typography } from '@mui/material'
 import { DateTimePicker } from '@mui/x-date-pickers'
-import { BsCheckLg, BsFillClockFill, BsPencilSquare, BsXCircleFill } from 'react-icons/bs'
+import { BsPencilSquare } from 'react-icons/bs'
 import { compareDate } from '../helpers/dateTimes'
 import { handleSelectedTask } from '../store/features/tasks/taskSlice'
+import { updateTaskApi } from '../store/features/tasks/thunks'
 
 export const TaskItem = ({ task, handleOpenModal }) => {
 
-    const { id, title, description, createdAt, expirationDate } = task;
+    const { id, description, createdAt, expirationDate, completed } = task;
     const dispatch = useDispatch();
-  
+
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
     const handleChangeChecked = ({ target }, id) => {
         const isChecked = target.checked;
-        dispatch(handleSelectedTask({id, isChecked}))
+        dispatch(handleSelectedTask({ id, isChecked }))
     }
 
+    const handleChangeCompleted = ({ target }) => {
+        if (target.checked) {
+            dispatch(updateTaskApi({
+                ...task,
+                completed: true
+            }))
+        }
+        else {
+            dispatch(updateTaskApi({
+                ...task,
+                completed: false
+            }))
+        }
+    }
 
     return (
         <Card
@@ -31,82 +46,72 @@ export const TaskItem = ({ task, handleOpenModal }) => {
             }}
         >
 
-            <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 2 }}>
-                <Checkbox 
-                    {...label} 
-                    sx={{}}
-                    onChange={(e) => handleChangeChecked(e, id)}
-                />
+            <Grid container justifyContent="space-between" alignItems="center" sx={{ px: 2, py: 2 }}>
+                
 
-                <BsPencilSquare
-                    style={{ cursor: 'pointer', color: '#1976d2' }}
-                    size={"1.5rem"}
-                    onClick={() => handleOpenModal(task)}
+                <Tooltip title="Seleccionar Tarea">
+                    <IconButton>
+                        <Checkbox
+                            {...label}
+                            sx={{}}
+                            onChange={(e) => handleChangeChecked(e, id)}
+                        />
+                    </IconButton>
+                </Tooltip>
+
+                <FormControlLabel
+                    label="Completada"
+                    checked={completed ? true : false}
+                    control={
+                        <Switch
+                            onChange={handleChangeCompleted}
+                        />
+                    }
                 />
+                
+
+                <Tooltip title="Editar Tarea">
+                    <IconButton
+                        onClick={() => handleOpenModal(task)}
+                    >
+                        <BsPencilSquare
+                            style={{ cursor: 'pointer', color: '#1976d2' }}
+                            size={"1.5rem"}
+
+                        />
+                    </IconButton>
+                </Tooltip>
             </Grid>
-            
+
+
 
             <Grid container spacing={2} alignItems="center" sx={{ pb: 4 }}>
-                <Grid item xs={12} container direction="row" justifyContent="center" >
-                    <Typography variant="h4" sx={{mt: 0}}>
-                        {title}
+                <Grid container item xs={12} justifyContent="space-around" alignItems="center">
+                    <Typography variant="body1">
+                        {description}
                     </Typography>
+
+                    <DateTimePicker
+                        label="Fecha de expiración"
+                        readOnly
+                        value={expirationDate}
+                        onChange={(value) => dispatch(updateTaskApi({ ...task, value }))}
+                        minDate={new Date()}
+                        ampm={false}
+                        renderInput={(params) =>
+                            <TextField
+                                type="date"
+                                sx={{ my: 1 }}
+                                {...params}
+                                style={{ backgroundColor: 'white' }}
+                            />
+                        }
+                    />
+
                 </Grid>
-                <Grid container item xs={12} justifyContent="space-evenly" >
-                    <Grid container item xs={5} justifyContent="center" alignItems="center">
-                        <Typography variant="body1">
-                            {description}
-                        </Typography>
-                    </Grid>   
-                    
-                    <Grid item xs={4} container justifyContent="center" direction="column">
-                        <DateTimePicker
-                            label="Fecha de creación"
-                            readOnly
-                            value={createdAt}
-                            onChange={(value) => setExpirationDate(value)}
-                            minDate={new Date()}
-                            ampm={false}
-                            renderInput={(params) =>
-                                <TextField
-                                    type="date"
-                                    sx={{ my: 1 }}
-                                    {...params}
-                                />
-                            }
-                        />
-                        <DateTimePicker
-                            label="Fecha de expiración"
-                            readOnly
-                            value={expirationDate}
-                            onChange={(value) => setExpirationDate(value)}
-                            minDate={new Date()}
-                            ampm={false}
-                            renderInput={(params) =>
-                                <TextField
-                                    type="date"
-                                    sx={{ my: 1 }}
-                                    {...params}
-                                />
-                            }
-                        />
-                    </Grid>
-                </Grid>
-                
+
             </Grid>
 
-          
-                {/* {
-                    compareDate(createdAt, expirationDate) <= 0
-                        ?
-                        <BsXCircleFill size={40} />
-                        :
-                        (compareDate(createdAt, expirationDate) > 0 && compareDate(createdAt, expirationDate) <= 3)
-                            ?
-                            <BsFillClockFill size={40} />
-                            :
-                            <BsCheckLg size={40} />
-                } */}
         </Card>
     )
 }

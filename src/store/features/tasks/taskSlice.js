@@ -12,10 +12,14 @@ export const taskSlice = createSlice({
     initialState,
     reducers:{
         getTasks: (state, action) => {
-            state.tasks = action.payload.tasks; 
+
+            let tasksFromDB = action.payload.tasks
+            tasksFromDB = action.payload.tasks.sort((a, b) => {
+                return ( a.expirationDate > b.expirationDate) ? 1 : -1
+            }) 
+            state.tasks = tasksFromDB; 
         },
-        addTask: (state, action) => { 
-        
+        addTask: (state, action) => {      
         },
         updateTask: (state, action) => {
             state.tasks = state.tasks.filter( task => task.id !== action.payload)
@@ -38,10 +42,32 @@ export const taskSlice = createSlice({
             state.tasksSelected.push(action.payload) 
             : 
             state.tasksSelected = state.tasksSelected.filter(task => task.id !== id)
+        },
+        orderTasks: (state, action) => {
+            if(action.payload === 'order1'){ //Por fecha de creación
+                state.tasks = state.tasks.sort((a, b) => {
+                    return ( a.createdAt > b.createdAt) ? 1 : -1
+                }) 
+            }
+            if(action.payload === 'order2'){ //Por fecha de vencimiento
+                state.tasks = state.tasks.sort((a, b) => {
+                    return ( a.expirationDate > b.expirationDate) ? 1 : -1
+                }) 
+            }
+            if(action.payload === 'order3'){ //Por estado
+                state.tasks = state.tasks.sort((a, b) => {
+                    return ( a.completed > b.completed) ? 1 : -1
+                }) 
+            } 
+            if(action.payload === 'order4'){ //Por texto
+                state.tasks = state.tasks.sort((a, b) => {
+                    return (a.description.toLowerCase() > b.description.toLowerCase()) ? 1: -1
+                })
+            } 
         }
 
     }
 })
 
-export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask } = taskSlice.actions  
+export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, orderTasks } = taskSlice.actions  
 export default taskSlice.reducer

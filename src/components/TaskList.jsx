@@ -1,22 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
 import { deleteTaskAPI, getTasksAPI } from '../store/features/tasks/thunks';
 import { useForm } from '../hooks/useForm';
-import { changeEditCreate, changeOpenModal } from '../store/features/tasks/taskSlice';
+import { changeEditCreate, changeOpenModal, orderTasks } from '../store/features/tasks/taskSlice';
 import { TaskModal } from './TaskModal';
 import { TaskItem } from './TaskItem';
 
-import Button from '@mui/material/Button';
 import { Container } from '@mui/system';
-
-import { AiFillFileAdd } from 'react-icons/ai';
-import { FaTrash } from 'react-icons/fa';
+import { ActionButton } from './ActionButton';
+import { Button, Menu, MenuItem, Fade } from '@mui/material';
 
 export const TaskList = () => {
 
     const { handleChange, handleReset, inputs, setInputs } = useForm({
         id: '',
-        title: '',
         description: '',
         expirationDate: null,
     });
@@ -28,8 +26,6 @@ export const TaskList = () => {
     useEffect(() => {
         dispatch(getTasksAPI());
     }, [])
-
-    const handleDeleteTask = () => dispatch(deleteTaskAPI(tasksSelected))
 
     const handleOpenModal = (task) => {
 
@@ -45,37 +41,82 @@ export const TaskList = () => {
         dispatch(changeOpenModal(!openModal))
     }
 
+    const handleDeleteTask = () => {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: "No podrá volver a recuperar las tareas eliminadas",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, borrarlas!',
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteTaskAPI(tasksSelected))
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Eliminación correcta',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        })
+    }
+
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleOrderMenu = (order) => {
+        dispatch(orderTasks(order))
+        setAnchorEl(null);
+    };
+
     return (
         <Container maxWidth="md">
-            <header>
+            <header>    
                 <h1>Cosas por Hacer</h1>
-                <p>
-                    Primero preguntar si está seguro de borrar. <br />
-                    Finalmente, poner un boton de restaurar (las tareas borradas se guardan al localstorage)
-                </p>
             </header>
 
-            <Button
-                variant="outlined"
-                onClick={() => handleOpenModal(null)}
-            >
-                Crear tarea
-                <AiFillFileAdd
-                    size={20}
-                    style={{ marginLeft: "1rem" }}
-                />
-            </Button>
+
+
+            <ActionButton
+                handleFunction={() => handleOpenModal(null)}
+                text={`Crear tarea`}
+                icon={`addTask`}
+            />
+            <ActionButton
+                handleFunction={handleDeleteTask }
+                text={'Eliminar Seleccionados'}
+                icon={`deleteTask`}
+            />
 
             <Button
                 variant="outlined"
-                onClick={() => handleDeleteTask()}
+                id="fade-button"
+                aria-controls={open ? 'fade-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={(event) => setAnchorEl(event.currentTarget)}
             >
-                Limpiar Seleccionados
-                <FaTrash
-                    size={20}
-                    style={{ marginLeft: "1rem" }}
-                />
+                Ordenar Tareas
             </Button>
+            <Menu
+                id="fade-menu"
+                MenuListProps={{
+                    'aria-labelledby': 'fade-button',
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={() => setAnchorEl(null)}
+                TransitionComponent={Fade}
+            >
+                <MenuItem onClick={() => handleOrderMenu('order1')}>Fecha de creación</MenuItem>
+                <MenuItem onClick={() => handleOrderMenu('order2')}>Fecha de vencimiento</MenuItem>
+                <MenuItem onClick={() => handleOrderMenu('order3')}>Estado</MenuItem>
+                <MenuItem onClick={() => handleOrderMenu('order4')}>Descripción</MenuItem>
+            </Menu>
 
             {
                 tasks.map(task => (
@@ -86,9 +127,6 @@ export const TaskList = () => {
                     />
                 ))
             }
-
-
-
             <TaskModal
                 handleChange={handleChange}
                 inputs={inputs}

@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux';
 import { modalStyles } from '../styles/styles';
 import { changeOpenModal } from '../store/features/tasks/taskSlice';
@@ -11,7 +12,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
     const { openModal, inEdit } = useSelector(state => state.tasks);
     const dispatch = useDispatch();
 
-    const { title, description, expirationDate } = inputs;
+    const { description, expirationDate } = inputs;
 
     const handleAddTask = () => {
         dispatch(addTaskAPI({
@@ -19,6 +20,14 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
             expirationDate: dateFormat(expirationDate)
         }))
         dispatch(changeOpenModal(!openModal))
+
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Nueva tarea creada correctamente',
+            showConfirmButton: false,
+            timer: 1500
+        })
     }
 
     const handleUpdateTask = () => {
@@ -27,6 +36,14 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
             expirationDate: dateFormat(expirationDate)
         }))
         dispatch(changeOpenModal(!openModal))
+        
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Tarea editada',
+            showConfirmButton: false,
+            timer: 1500
+        })
     }
 
     return (
@@ -37,25 +54,11 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={modalStyles}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                    <TextField
-                        fullWidth
-                        id="standard-basic"
-                        margin="dense"
-                        label="Titulo"
-                        variant="standard"
-                        name="title"
-                        type="text"
-                        onChange={handleChange}
-                        value={title}
-                        sx={{ marginTop: 1 }}
-                    />
-                </Typography>
 
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     <TextField
+                        error={description.length < 5 && true}
                         fullWidth
-                        multiline
                         id="outlined-multiline-static"
                         margin="dense"
                         label="Descripción"
@@ -65,7 +68,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                         onChange={handleChange}
                         value={description}
                         sx={{ marginTop: 1 }}
-                        rows={2}
+                        helperText={ description.length < 5 && "Mínimo 5 caractéres" }
                     />
                 </Typography>
                 <DateTimePicker
@@ -79,10 +82,13 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                             fullWidth
                             type="datetime"
                             sx={{ marginTop: 3 }}
+                            helperText={ expirationDate == null && "Ingresa una fecha" }
                             {...params}
+                            error={expirationDate == null && true}
                         />
                     }
                 />
+                
                 <div style={{ marginTop: '2rem' }}>
                     <Button
                         onClick={() => dispatch(changeOpenModal(!openModal))}
@@ -93,6 +99,10 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                         onClick={inEdit ? handleUpdateTask : handleAddTask}
                         variant="contained"
                         color="success"
+                        disabled={ 
+                            ( description.length < 5 || expirationDate == null)
+                            && true 
+                        }
                     >
                         Guardar
                     </Button>

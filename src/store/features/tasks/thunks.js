@@ -13,7 +13,6 @@ export const addTaskAPI = (newTask) => {
     return async (dispatch, getState) => {
 
         await axios.post('http://localhost:3000/api/tasks',{
-            title: newTask.title,
             description: newTask.description,
             expirationDate: newTask.expirationDate
         })
@@ -28,9 +27,9 @@ export const updateTaskApi = (task) => {
     return async(dispatch, getState) => {
 
         await axios.patch(`http://localhost:3000/api/tasks/${task.id}`, {
-            title: task.title,
             description: task.description,
-            expirationDate: task.expirationDate
+            expirationDate: task.expirationDate,
+            completed: task.completed
         })
         .then((response) =>{
             dispatch(updateTask(task))  
@@ -38,6 +37,7 @@ export const updateTaskApi = (task) => {
         }) 
     }
 }
+
 
 export const deleteTaskAPI = (task) => {
     return (dispatch, getState) => {
