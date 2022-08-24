@@ -10,7 +10,7 @@ import { ActionButton } from './ActionButton';
 import { TaskModal } from './TaskModal';
 import { Container } from '@mui/system';
 import { Button, Menu, MenuItem, Fade } from '@mui/material';
-
+import TestTable from './TestTable';
 
 export const TaskList = () => {
 
@@ -81,7 +81,13 @@ export const TaskList = () => {
         <Container maxWidth="md">
             <header>
                 <h1>Cosas por Hacer</h1>
+                <ol>
+                    <li>Fusionar tabla haciendo retroingeniería</li>
+                    <li>Ver la posibilidad de páginar desde backend y frontend con tabla.</li>
+                </ol>
             </header>
+
+            <TestTable />
 
             <div>
                 <ActionButton

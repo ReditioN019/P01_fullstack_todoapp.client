@@ -5,8 +5,6 @@ import { handleSelectedTask } from '../store/features/tasks/taskSlice';
 import { updateTaskApi } from '../store/features/tasks/thunks';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, FormControlLabel, IconButton, Switch, Tooltip} from '@mui/material';
 
-
-
 export const TaskTable = ({ tasks, handleOpenModal }) => {
 
 
