@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import Swal from 'sweetalert2'
 import { deleteTaskAPI, getTasksAPI } from '../store/features/tasks/thunks';
+import { TaskTable } from './TaskTable';
 import { useForm } from '../hooks/useForm';
 import { orderTasks } from '../store/features/tasks/taskSlice';
 import { changeEditCreate, changeOpenModal } from '../store/features/actions/actionSlice';
-import { TaskModal } from './TaskModal';
-import { TaskItem } from './TaskItem';
-
-import { Container } from '@mui/system';
 import { ActionButton } from './ActionButton';
+import { TaskModal } from './TaskModal';
+import { Container } from '@mui/system';
 import { Button, Menu, MenuItem, Fade } from '@mui/material';
+
 
 export const TaskList = () => {
 
@@ -42,6 +42,7 @@ export const TaskList = () => {
 
         dispatch(changeOpenModal(!openModal))
     }
+
 
     const handleDeleteTask = () => {
         Swal.fire({
@@ -75,60 +76,61 @@ export const TaskList = () => {
         setAnchorEl(null);
     };
 
+
     return (
         <Container maxWidth="md">
-            <header>    
+            <header>
                 <h1>Cosas por Hacer</h1>
             </header>
 
+            <div>
+                <ActionButton
+                    handleFunction={() => handleOpenModal(null)}
+                    text={`Crear tarea`}
+                    icon={`addTask`}
+                />
+                <ActionButton
+                    handleFunction={handleDeleteTask}
+                    text={'Eliminar Seleccionados'}
+                    icon={`deleteTask`}
+                />
+
+                <Button
+                    variant="outlined"
+                    id="fade-button"
+                    aria-controls={open ? 'fade-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                >
+                    Ordenar Tareas
+                </Button>
+                <Menu
+                    id="fade-menu"
+                    MenuListProps={{
+                        'aria-labelledby': 'fade-button',
+                    }}
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={() => setAnchorEl(null)}
+                    TransitionComponent={Fade}
+                >
+                    <MenuItem onClick={() => handleOrderMenu('order1')}>Fecha de creación</MenuItem>
+                    <MenuItem onClick={() => handleOrderMenu('order2')}>Fecha de vencimiento</MenuItem>
+                    <MenuItem onClick={() => handleOrderMenu('order3')}>Estado</MenuItem>
+                    <MenuItem onClick={() => handleOrderMenu('order4')}>Descripción</MenuItem>
+                </Menu>
+            </div>
 
 
-            <ActionButton
-                handleFunction={() => handleOpenModal(null)}
-                text={`Crear tarea`}
-                icon={`addTask`}
+
+
+            <TaskTable
+                tasks={tasks}
+                handleOpenModal={handleOpenModal}
             />
-            <ActionButton
-                handleFunction={handleDeleteTask }
-                text={'Eliminar Seleccionados'}
-                icon={`deleteTask`}
-            />
 
-            <Button
-                variant="outlined"
-                id="fade-button"
-                aria-controls={open ? 'fade-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-                onClick={(event) => setAnchorEl(event.currentTarget)}
-            >
-                Ordenar Tareas
-            </Button>
-            <Menu
-                id="fade-menu"
-                MenuListProps={{
-                    'aria-labelledby': 'fade-button',
-                }}
-                anchorEl={anchorEl}
-                open={open}
-                onClose={() => setAnchorEl(null)}
-                TransitionComponent={Fade}
-            >
-                <MenuItem onClick={() => handleOrderMenu('order1')}>Fecha de creación</MenuItem>
-                <MenuItem onClick={() => handleOrderMenu('order2')}>Fecha de vencimiento</MenuItem>
-                <MenuItem onClick={() => handleOrderMenu('order3')}>Estado</MenuItem>
-                <MenuItem onClick={() => handleOrderMenu('order4')}>Descripción</MenuItem>
-            </Menu>
 
-            {
-                tasks.map(task => (
-                    <TaskItem
-                        key={task.id}
-                        task={task}
-                        handleOpenModal={handleOpenModal}
-                    />
-                ))
-            }
             <TaskModal
                 handleChange={handleChange}
                 inputs={inputs}

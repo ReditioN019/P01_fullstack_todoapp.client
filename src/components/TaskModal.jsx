@@ -1,11 +1,11 @@
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import { modalStyles } from '../styles/styles';
-import { checkDate, dateFormat } from '../helpers/dateTimes';
+import { checkDate, dateFormatForSaveInDB } from '../helpers/dateTimes';
 import { addTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
-import { DateTimePicker } from '@mui/x-date-pickers';
 import { changeOpenModal } from '../store/features/actions/actionSlice';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 
 export const TaskModal = ({ handleChange, inputs, setInputs }) => {
 
@@ -17,7 +17,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
     const handleAddTask = () => {
         dispatch(addTaskAPI({
             ...inputs,
-            expirationDate: dateFormat(expirationDate)
+            expirationDate: dateFormatForSaveInDB(expirationDate)
         }))
         dispatch(changeOpenModal(!openModal))
 
@@ -33,7 +33,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
     const handleUpdateTask = () => {
         dispatch(updateTaskApi({
             ...inputs,
-            expirationDate: dateFormat(expirationDate)
+            expirationDate: dateFormatForSaveInDB(expirationDate)
         }))
         dispatch(changeOpenModal(!openModal))
         
@@ -57,6 +57,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
 
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     <TextField
+                        autoFocus 
                         error={
                             (description.length >= 1 && description.length < 5 )
                             && true

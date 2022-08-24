@@ -7,16 +7,10 @@ export const compareDate = (fechaInicial, fechaFinal) => {
     return Math.round(numDays);
 }
 
-export const dateFormat = (date) => {
+export const dateFormatForSaveInDB = (date) => {
     
-    date = new Date(date);
+    const { day, month, year, hours, minutes } = divideDate(date);
     
-    let day = date.getDate();
-    let month = date.getMonth();
-    let year = date.getFullYear();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-
     const dateFormat = new Date(year, month, day, hours, minutes);
     let isoString = dateFormat.toISOString(); 
     return isoString.toLocaleString()
@@ -32,4 +26,19 @@ export const checkDate = (date) => {
         return false
     }
     return true;
+}
+
+
+
+
+const divideDate = (date) => {
+    date = new Date(date);
+    
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    return {day, month, year, hours, minutes}
 }

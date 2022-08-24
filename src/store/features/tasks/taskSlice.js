@@ -10,15 +10,14 @@ export const taskSlice = createSlice({
     initialState,
     reducers:{
         getTasks: (state, action) => {
-            const a = action.payload.tasks.sort((a, b) => {
+            state.tasks  = action.payload.tasks.sort((a, b) => {
                 return ( a.expirationDate > b.expirationDate) ? 1 : -1
+            }).sort((a,b) => {
+                return (a.completed > b.completed) ? 1 : -1
             })
-            const b = a.map(item => {
-                console.log(item)
-            })
-            // .map(item => {
-                // console.log(item.description)
-            // })
+            // for(let x in a)
+            // a[x].completed === true  ? a.push( a.splice(x,1)[0] )  : 0;
+
         },
         addTask: (state, action) => {      
         },
@@ -58,6 +57,9 @@ export const taskSlice = createSlice({
                     return (a.description.toLowerCase() > b.description.toLowerCase()) ? 1: -1
                 })
             } 
+            // state.tasks = state.tasks.sort((a,b) => {
+            //     return (a.completed > b.completed) ? 1 : -1
+            // })
         }
 
     }
