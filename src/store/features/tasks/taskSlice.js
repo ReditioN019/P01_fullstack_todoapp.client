@@ -2,8 +2,6 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     tasks: [],
-    openModal: false, //abrir y cerrar modal
-    inEdit: null, //es para saber si se está editando o creando una tarea
     tasksSelected: []
 }
 
@@ -12,28 +10,24 @@ export const taskSlice = createSlice({
     initialState,
     reducers:{
         getTasks: (state, action) => {
-
-            let tasksFromDB = action.payload.tasks
-            tasksFromDB = action.payload.tasks.sort((a, b) => {
+            const a = action.payload.tasks.sort((a, b) => {
                 return ( a.expirationDate > b.expirationDate) ? 1 : -1
-            }) 
-            state.tasks = tasksFromDB; 
+            })
+            const b = a.map(item => {
+                console.log(item)
+            })
+            // .map(item => {
+                // console.log(item.description)
+            // })
         },
         addTask: (state, action) => {      
         },
         updateTask: (state, action) => {
             state.tasks = state.tasks.filter( task => task.id !== action.payload)
-            getTasks()
         },
         deleteTask: (state, action) => {
             state.tasks = state.tasks.filter( task => task.id !== action.payload )
             state.tasksSelected = [];
-        },
-        changeOpenModal:(state, action) => {
-            state.openModal = !state.openModal
-        },
-        changeEditCreate: (state, action) => {
-            state.inEdit = action.payload
         },
         handleSelectedTask: (state, action) => {
             const { id, isChecked } = action.payload    

@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import Swal from 'sweetalert2'
 import { deleteTaskAPI, getTasksAPI } from '../store/features/tasks/thunks';
 import { useForm } from '../hooks/useForm';
-import { changeEditCreate, changeOpenModal, orderTasks } from '../store/features/tasks/taskSlice';
+import { orderTasks } from '../store/features/tasks/taskSlice';
+import { changeEditCreate, changeOpenModal } from '../store/features/actions/actionSlice';
 import { TaskModal } from './TaskModal';
 import { TaskItem } from './TaskItem';
 
@@ -20,7 +21,8 @@ export const TaskList = () => {
     });
 
     //Accedo a tasks del store, que a su vez, es el initialState
-    const { tasks, openModal, tasksSelected } = useSelector(state => state.tasks);
+    const { tasks, tasksSelected } = useSelector(state => state.tasks);
+    const { openModal } = useSelector(state => state.actions);
     const dispatch = useDispatch();
 
     useEffect(() => {

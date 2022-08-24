@@ -1,15 +1,15 @@
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import { modalStyles } from '../styles/styles';
-import { changeOpenModal } from '../store/features/tasks/taskSlice';
-import { dateFormat } from '../helpers/dateTimes';
+import { checkDate, dateFormat } from '../helpers/dateTimes';
 import { addTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { Box, Button, Modal, TextField, Typography } from '@mui/material';
+import { changeOpenModal } from '../store/features/actions/actionSlice';
 
 export const TaskModal = ({ handleChange, inputs, setInputs }) => {
 
-    const { openModal, inEdit } = useSelector(state => state.tasks);
+    const { openModal, inEdit } = useSelector(state => state.actions);
     const dispatch = useDispatch();
 
     const { description, expirationDate } = inputs;
@@ -57,7 +57,10 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
 
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     <TextField
-                        error={description.length < 5 && true}
+                        error={
+                            (description.length >= 1 && description.length < 5 )
+                            && true
+                        }
                         fullWidth
                         id="outlined-multiline-static"
                         margin="dense"
@@ -68,7 +71,10 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                         onChange={handleChange}
                         value={description}
                         sx={{ marginTop: 1 }}
-                        helperText={ description.length < 5 && "Mínimo 5 caractéres" }
+                        helperText={ 
+                            (description.length >= 1 && description.length < 5 ) 
+                            && "Mínimo 5 caractéres" 
+                        }
                     />
                 </Typography>
                 <DateTimePicker
@@ -82,9 +88,15 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                             fullWidth
                             type="datetime"
                             sx={{ marginTop: 3 }}
-                            helperText={ expirationDate == null && "Ingresa una fecha" }
                             {...params}
-                            error={expirationDate == null && true}
+                            helperText={ 
+                                expirationDate == null 
+                                && "Debe ser mayor a la fecha y hora actual" 
+                            }   
+                            error={ 
+                                ( expirationDate == null || checkDate(expirationDate) )
+                                && true
+                            }
                         />
                     }
                 />
@@ -100,7 +112,10 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                         variant="contained"
                         color="success"
                         disabled={ 
-                            ( description.length < 5 || expirationDate == null)
+                            ( description.length < 5 || 
+                                expirationDate == null || 
+                                checkDate(expirationDate)
+                            )
                             && true 
                         }
                     >

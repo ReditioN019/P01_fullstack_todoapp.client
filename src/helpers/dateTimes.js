@@ -21,3 +21,15 @@ export const dateFormat = (date) => {
     let isoString = dateFormat.toISOString(); 
     return isoString.toLocaleString()
 }
+
+//Comprueba que la fecha sea mayor a ahora
+export const checkDate = (date) => {
+    const today = new Date().getTime();
+
+    date = new Date(date);
+
+    if(Date.parse(date) && (date.getTime() > today)){
+        return false
+    }
+    return true;
+}
