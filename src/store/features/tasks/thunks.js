@@ -29,7 +29,8 @@ export const updateTaskApi = task => {
         await taskApi.patch( task.id, {
             description: task.description,
             expirationDate: task.expirationDate,
-            completed: task.completed
+            completed: task.completed,
+            isChecked: task.isChecked
         })
         .then((response) =>{
             dispatch(updateTask(task))  

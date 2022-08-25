@@ -30,8 +30,6 @@ export const taskSlice = createSlice({
         },
         handleSelectedTask: (state, action) => {
             const { id, isChecked } = action.payload   
-            
-            // console.log("Tarea seleccionada: ", action.payload)
 
             isChecked 
             ? state.tasksSelected.push(action.payload) 

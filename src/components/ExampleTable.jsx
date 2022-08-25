@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux'
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,9 +21,35 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { handleSelectedTask, removeAllTasks, selectedAllTasks } from '../store/features/tasks/taskSlice';
+import { useState } from 'react';
 
-//TODO: ORDER COLUMN
+function createData(name, calories, fat, carbs, protein) {
+    return {
+        name,
+        calories,
+        fat,
+        carbs,
+        protein,
+    };
+}
+
+
+const rows = [
+    createData('Cupcake', 305, 3.7, 67, 4.3),
+    createData('Donut', 452, 25.0, 51, 4.9),
+    createData('Eclair', 262, 16.0, 24, 6.0),
+    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+    createData('Gingerbread', 356, 16.0, 49, 3.9),
+    createData('Honeycomb', 408, 3.2, 87, 6.5),
+    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+    createData('Jelly Bean', 375, 0.0, 94, 0.0),
+    createData('KitKat', 518, 26.0, 65, 7.0),
+    createData('Lollipop', 392, 0.2, 98, 0.0),
+    createData('Marshmallow', 318, 0, 81, 2.0),
+    createData('Nougat', 360, 19.0, 9, 37.0),
+    createData('Oreo', 437, 18.0, 63, 4.0),
+];
+
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -34,32 +60,30 @@ function descendingComparator(a, b, orderBy) {
     return 0;
 }
 
-//TODO: ORDER COLUMNS
-const getComparator = (order, orderBy) => {
+function getComparator(order, orderBy) {
     return order === 'desc'
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-//TODO: Esto es lo que va en la primera fila de la tabla (inmutable)
 const headCells = [
     {
-        id: 'description',
+        id: 'name',
         numeric: false,
         disablePadding: true,
-        label: 'Descripción',
+        label: 'Dessert (100g serving)',
     },
     {
-        id: 'createdAt',
+        id: 'calories',
         numeric: true,
         disablePadding: false,
-        label: 'Creación',
+        label: 'Calories',
     },
     {
-        id: 'expirationDate',
+        id: 'fat',
         numeric: true,
         disablePadding: false,
-        label: 'Expira',
+        label: 'Fat (g)',
     },
     {
         id: 'carbs',
@@ -76,17 +100,17 @@ const headCells = [
 ];
 
 
-export default function TestTable({ handleOpenModal }) {
 
-    // console.log(tasks)
+export default function ExampleTable() {
+    
     const { tasks, tasksSelected } = useSelector(state => state.tasks);
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
+    const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [dense, setDense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -94,88 +118,81 @@ export default function TestTable({ handleOpenModal }) {
         setOrderBy(property);
     };
 
-
-    //! Esto sirve para establecer el número de filas seleccionadas (lo muestra arriba)
-    const handleClick = (event, name) => {
-           
-        const selectedIndex = tasksSelected.indexOf(name);
-        let newSelected = [];
-
-        if (selectedIndex === -1) 
-            newSelected = newSelected.concat(tasksSelected, name);
-        else if (selectedIndex === 0) 
-            newSelected = newSelected.concat(tasksSelected.slice(1)); 
-        else if (selectedIndex === selected.length - 1) 
-            newSelected = newSelected.concat(tasksSelected.slice(0, -1));  
-        else if (selectedIndex > 0) 
-            newSelected = newSelected.concat(
-                tasksSelected.slice(0, selectedIndex),
-                tasksSelected.slice(selectedIndex + 1),
-            );
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            const newSelected = rows.map((n) => n.name);
+            setSelected(newSelected);
+            return;
+        }
+        setSelected([]);
     };
 
-    const handleChangePage = (event, newPage) => setPage(newPage);
+    const handleClick = (event, name) => {
+        const selectedIndex = selected.indexOf(name);
+        let newSelected = [];
 
-    const handleChangeRowsPerPage = ({target}) => {
-        setRowsPerPage(parseInt(target.value, 10));
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, name);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
+            );
+        }
+
+        setSelected(newSelected);
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const handleChangeDense = ({target}) => setDense(target.checked);
+    const handleChangeDense = (event) => {
+        setDense(event.target.checked);
+    };
 
-    // Evita un salto de diseño al llegar a la última página con filas vacías.
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tasks.length) : 0;
+    const isSelected = (name) => selected.indexOf(name) !== -1;
 
-    const createSortHandler = (property) => (event) => handleRequestSort(event, property);
+    // Avoid a layout jump when reaching the last page with empty rows.
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-    //?================================================================================
-    const dispatch = useDispatch(); 
 
-    const formatearFecha = (date) => {
-        date = new Date(date)
-        return date.toLocaleString()
-    }
-    
-    const handleChangeChecked = ({ target }, id) => {
-        if( !id ) {
-            if(target.checked){
-                console.log("checkeo el principal")
-                dispatch(selectedAllTasks()) 
-            } 
-            if(!target.checked) 
-                dispatch(removeAllTasks())
-            
-        }
-        else{
-            const isChecked = target.checked;
-            dispatch(handleSelectedTask({ id, isChecked }))
-            
-        } 
-    }
+    const createSortHandler = (property) => (event) => {
+        handleRequestSort(event, property);
+    };
 
-    //**** Funcion que deja seleccionada la fila si es checkeada
-    const isSelected = (id) =>  tasksSelected.some(task => task.id === id)
-    
-    // console.log(tasksSelected)
     return (
-        <Box>
-            <Paper>
+        <Box sx={{ width: '100%' }}>
+            <Paper sx={{ width: '100%', mb: 2 }}>
+
                 <Toolbar
-                    sx={{          
-                        ...(tasksSelected.length > 0 && {
+                    sx={{
+                        pl: { sm: 2 },
+                        pr: { xs: 1, sm: 1 },
+                        ...(selected.length > 0 && {
                             bgcolor: (theme) =>
                                 alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
                         }),
                     }}
                 >
-                    {tasksSelected.length > 0 ? (
+                    {selected.length > 0 ? (
                         <Typography
                             sx={{ flex: '1 1 100%' }}
                             color="inherit"
                             variant="subtitle1"
                             component="div"
                         >
-                            Seleccionado: {tasksSelected.length} 
+                            {selected.length} selected
                         </Typography>
                     ) : (
                         <Typography
@@ -184,11 +201,11 @@ export default function TestTable({ handleOpenModal }) {
                             id="tableTitle"
                             component="div"
                         >
-                            Tareas
+                            Nutrition
                         </Typography>
                     )}
 
-                    {tasksSelected.length > 0 ? (
+                    { selected.length > 0 ? (
                         <Tooltip title="Delete">
                             <IconButton>
                                 <DeleteIcon />
@@ -203,7 +220,6 @@ export default function TestTable({ handleOpenModal }) {
                     )}
                 </Toolbar>
 
-                
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -211,18 +227,21 @@ export default function TestTable({ handleOpenModal }) {
                         size={dense ? 'small' : 'medium'}
                     >
 
+
                         <TableHead>
                             <TableRow>
                                 <TableCell padding="checkbox">
                                     <Checkbox
-                                        indeterminate={tasksSelected.length > 0 && tasksSelected.length < tasks.length}
-                                        checked={tasksSelected.length === tasks.length}
-                                        onClick={(e) => handleChangeChecked(e, null)}
-                                        // onChange={(e) => handleChangeChecked(e, null)}
-                                        // inputProps={{ 'aria-label': 'select all desserts' }}
+                                        color="primary"
+                                        indeterminate={selected.length > 0 && selected.length < rows.length}
+                                        checked={rows.length > 0 && selected.length === rows.length}
+                                        onChange={handleSelectAllClick}
+                                        inputProps={{
+                                            'aria-label': 'select all desserts',
+                                        }}
                                     />
                                 </TableCell>
-                                { headCells.map((headCell) => (
+                                {headCells.map((headCell) => (
                                     <TableCell
                                         key={headCell.id}
                                         align={headCell.numeric ? 'right' : 'left'}
@@ -248,48 +267,43 @@ export default function TestTable({ handleOpenModal }) {
 
 
                         <TableBody>
-                            {tasks.slice().sort(getComparator(order, orderBy))
+                            {rows.slice().sort(getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => ((
                                     <TableRow
                                         hover
-                                        key={row.id}
+                                        key={row.name}
                                         onClick={(event) => handleClick(event, row.name)}
                                         role="checkbox"
-                                        selected={isSelected(row.id)}
+                                        selected={isSelected(row.name)}
                                         // tabIndex={-1}
-                                        // aria-checked={isSelected(row.id)}
-                                        // onChange={(e) => handleChangeChecked(e, row.id)}
+                                        // aria-checked={isSelected(row.name)}
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
-                                                // inputProps= {{'aria-label': 'Checkbox demo' }}
-                                                onChange={(e) => handleChangeChecked(e, row.id)}
-                                                checked={isSelected(row.id)}
+                                                color="primary"
+                                                checked={isSelected(row.name)}
                                                 inputProps={{
                                                     'aria-labelledby': `enhanced-table-checkbox-${index}`,
                                                 }}
-                                                
-                                                // checked={tasksSelected.length === tasks.length && true}
                                             />
                                         </TableCell>
                                         <TableCell
                                             component="th"
+                                            id={`enhanced-table-checkbox-${index}`}
                                             scope="row"
                                             padding="none"
                                         >
-                                            {row.description}
+                                            {row.name}
                                         </TableCell>
-                                        <TableCell align="right">{formatearFecha(row.createdAt)}</TableCell>
-                                        <TableCell align="right">{formatearFecha(row.expirationDate)}</TableCell>
+                                        <TableCell align="right">{row.calories}</TableCell>
+                                        <TableCell align="right">{row.fat}</TableCell>
                                         <TableCell align="right">{row.carbs}</TableCell>
                                         <TableCell align="right">{row.protein}</TableCell>
                                     </TableRow>
-                                    
                                 )))
                             }
-                            
-                            { emptyRows > 0 && (
+                            {emptyRows > 0 && (
                                 <TableRow
                                     style={{
                                         height: (dense ? 33 : 53) * emptyRows,
@@ -297,31 +311,22 @@ export default function TestTable({ handleOpenModal }) {
                                 >
                                     <TableCell colSpan={6} />
                                 </TableRow>
-                            ) }
-
+                            )}
                         </TableBody>
-                        
+
+
                     </Table>
-
                 </TableContainer>
-
-
-
                 <TablePagination
-                    labelRowsPerPage={"Filas por página"}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={tasks.length}
+                    count={rows.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-
-
             </Paper>
-
-            
             <FormControlLabel
                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                 label="Dense padding"

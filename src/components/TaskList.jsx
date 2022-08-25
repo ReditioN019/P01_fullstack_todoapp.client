@@ -11,6 +11,7 @@ import { TaskModal } from './TaskModal';
 import { Container } from '@mui/system';
 import { Button, Menu, MenuItem, Fade } from '@mui/material';
 import TestTable from './TestTable';
+import ExampleTable from './ExampleTable';
 
 export const TaskList = () => {
 
@@ -49,7 +50,7 @@ export const TaskList = () => {
             title: '¿Está seguro?',
             text: "No podrá volver a recuperar las tareas eliminadas",
             icon: 'question',
-            showCancelButton: true,
+            showCancelButton: true, 
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, borrarlas!',
@@ -88,8 +89,10 @@ export const TaskList = () => {
             </header>
 
             <TestTable 
-            handleOpenModal={handleOpenModal}
+                handleOpenModal={handleOpenModal}
             />
+
+            <ExampleTable />
 
             <div>
                 <ActionButton
@@ -144,6 +147,9 @@ export const TaskList = () => {
                 inputs={inputs}
                 setInputs={setInputs}
             />
+
+
+            
         </Container>
     )
 }
