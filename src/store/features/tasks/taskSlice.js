@@ -29,12 +29,13 @@ export const taskSlice = createSlice({
             state.tasksSelected = [];
         },
         handleSelectedTask: (state, action) => {
-            const { id, isChecked } = action.payload    
+            const { id, isChecked } = action.payload   
+            
+            // console.log("Tarea seleccionada: ", action.payload)
 
-            isChecked ? //agrego la tarea al array
-            state.tasksSelected.push(action.payload) 
-            : 
-            state.tasksSelected = state.tasksSelected.filter(task => task.id !== id)
+            isChecked 
+            ? state.tasksSelected.push(action.payload) 
+            : state.tasksSelected = state.tasksSelected.filter(task => task.id !== id)
         },
         orderTasks: (state, action) => {
             if(action.payload === 'order1'){ //Por fecha de creación
@@ -60,10 +61,20 @@ export const taskSlice = createSlice({
             // state.tasks = state.tasks.sort((a,b) => {
             //     return (a.completed > b.completed) ? 1 : -1
             // })
+        },
+        selectedAllTasks: (state, action) => {;
+            state.tasks.forEach(task => {
+                state.tasksSelected.push(task)
+            })
+        },
+        removeAllTasks: (state, action) => {
+            state.tasks.forEach(task => {
+                state.tasksSelected.pop(task)
+            })
         }
 
     }
 })
 
-export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, orderTasks } = taskSlice.actions  
+export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, orderTasks, selectedAllTasks,removeAllTasks } = taskSlice.actions  
 export default taskSlice.reducer

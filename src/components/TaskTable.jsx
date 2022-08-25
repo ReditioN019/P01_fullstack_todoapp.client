@@ -36,8 +36,6 @@ export const TaskTable = ({ tasks, handleOpenModal }) => {
         return date.toLocaleString()
     }
 
-    const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
     return (
         <TableContainer style={{ borderRadius: "10px" }}>
             <Table >
@@ -68,8 +66,7 @@ export const TaskTable = ({ tasks, handleOpenModal }) => {
                                 <Tooltip title="Seleccionar Tarea">
                                     <IconButton>
                                         <Checkbox
-                                            {...label}
-                                            sx={{}}
+                                            inputProps= {{'aria-label': 'Checkbox demo' }}
                                             onChange={(e) => handleChangeChecked(e, row.id)}
                                         />
                                     </IconButton>

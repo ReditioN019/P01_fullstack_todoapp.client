@@ -18,7 +18,7 @@ export const TaskList = () => {
         id: '',
         description: '',
         expirationDate: null,
-    });
+    }); 
 
     //Accedo a tasks del store, que a su vez, es el initialState
     const { tasks, tasksSelected } = useSelector(state => state.tasks);
@@ -87,7 +87,9 @@ export const TaskList = () => {
                 </ol>
             </header>
 
-            <TestTable />
+            <TestTable 
+            handleOpenModal={handleOpenModal}
+            />
 
             <div>
                 <ActionButton
