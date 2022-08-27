@@ -61,6 +61,7 @@ export const taskSlice = createSlice({
             // })
         },
         selectedAllTasks: (state, action) => {;
+            state.tasksSelected = []
             state.tasks.forEach(task => {
                 state.tasksSelected.push(task)
             })

@@ -105,7 +105,7 @@ export default function TestTable({ handleOpenModal }) {
             newSelected = newSelected.concat(tasksSelected, name);
         else if (selectedIndex === 0) 
             newSelected = newSelected.concat(tasksSelected.slice(1)); 
-        else if (selectedIndex === selected.length - 1) 
+        else if (selectedIndex === tasksSelected.length - 1) 
             newSelected = newSelected.concat(tasksSelected.slice(0, -1));  
         else if (selectedIndex > 0) 
             newSelected = newSelected.concat(
@@ -135,16 +135,15 @@ export default function TestTable({ handleOpenModal }) {
         date = new Date(date)
         return date.toLocaleString()
     }
+
     
     const handleChangeChecked = ({ target }, id) => {
         if( !id ) {
             if(target.checked){
-                console.log("checkeo el principal")
                 dispatch(selectedAllTasks()) 
             } 
             if(!target.checked) 
-                dispatch(removeAllTasks())
-            
+                dispatch(removeAllTasks())        
         }
         else{
             const isChecked = target.checked;
@@ -155,8 +154,8 @@ export default function TestTable({ handleOpenModal }) {
 
     //**** Funcion que deja seleccionada la fila si es checkeada
     const isSelected = (id) =>  tasksSelected.some(task => task.id === id)
+
     
-    // console.log(tasksSelected)
     return (
         <Box>
             <Paper>
@@ -219,7 +218,9 @@ export default function TestTable({ handleOpenModal }) {
                                         checked={tasksSelected.length === tasks.length}
                                         onClick={(e) => handleChangeChecked(e, null)}
                                         // onChange={(e) => handleChangeChecked(e, null)}
-                                        // inputProps={{ 'aria-label': 'select all desserts' }}
+                                        inputProps={{
+                                            'aria-label': 'select all desserts',
+                                        }}
                                     />
                                 </TableCell>
                                 { headCells.map((headCell) => (
