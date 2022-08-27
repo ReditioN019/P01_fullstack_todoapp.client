@@ -70,10 +70,13 @@ export const taskSlice = createSlice({
             state.tasks.forEach(task => {
                 state.tasksSelected.pop(task)
             })
+        },
+        deselectedTasks: (state, action) => {
+            state.tasksSelected = []
         }
 
     }
 })
 
-export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, orderTasks, selectedAllTasks,removeAllTasks } = taskSlice.actions  
+export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, orderTasks, selectedAllTasks,removeAllTasks, deselectedTasks } = taskSlice.actions  
 export default taskSlice.reducer

@@ -1,27 +1,15 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
+import Swal from 'sweetalert2'
+import { deselectedTasks, handleSelectedTask, removeAllTasks, selectedAllTasks } from '../store/features/tasks/taskSlice';
+import { deleteTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Toolbar, Typography, Paper, Checkbox, IconButton, Tooltip, FormControlLabel, Switch } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { handleSelectedTask, removeAllTasks, selectedAllTasks } from '../store/features/tasks/taskSlice';
+import { BsPencilSquare } from 'react-icons/bs'
+
 
 //TODO: ORDER COLUMN
 function descendingComparator(a, b, orderBy) {
@@ -60,19 +48,7 @@ const headCells = [
         numeric: true,
         disablePadding: false,
         label: 'Expira',
-    },
-    {
-        id: 'carbs',
-        numeric: true,
-        disablePadding: false,
-        label: 'Carbs (g)',
-    },
-    {
-        id: 'protein',
-        numeric: true,
-        disablePadding: false,
-        label: 'Protein (g)',
-    },
+    }
 ];
 
 
@@ -97,17 +73,17 @@ export default function TestTable({ handleOpenModal }) {
 
     //! Esto sirve para establecer el número de filas seleccionadas (lo muestra arriba)
     const handleClick = (event, name) => {
-           
+
         const selectedIndex = tasksSelected.indexOf(name);
         let newSelected = [];
 
-        if (selectedIndex === -1) 
+        if (selectedIndex === -1)
             newSelected = newSelected.concat(tasksSelected, name);
-        else if (selectedIndex === 0) 
-            newSelected = newSelected.concat(tasksSelected.slice(1)); 
-        else if (selectedIndex === tasksSelected.length - 1) 
-            newSelected = newSelected.concat(tasksSelected.slice(0, -1));  
-        else if (selectedIndex > 0) 
+        else if (selectedIndex === 0)
+            newSelected = newSelected.concat(tasksSelected.slice(1));
+        else if (selectedIndex === tasksSelected.length - 1)
+            newSelected = newSelected.concat(tasksSelected.slice(0, -1));
+        else if (selectedIndex > 0)
             newSelected = newSelected.concat(
                 tasksSelected.slice(0, selectedIndex),
                 tasksSelected.slice(selectedIndex + 1),
@@ -116,12 +92,12 @@ export default function TestTable({ handleOpenModal }) {
 
     const handleChangePage = (event, newPage) => setPage(newPage);
 
-    const handleChangeRowsPerPage = ({target}) => {
+    const handleChangeRowsPerPage = ({ target }) => {
         setRowsPerPage(parseInt(target.value, 10));
         setPage(0);
     };
 
-    const handleChangeDense = ({target}) => setDense(target.checked);
+    const handleChangeDense = ({ target }) => setDense(target.checked);
 
     // Evita un salto de diseño al llegar a la última página con filas vacías.
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tasks.length) : 0;
@@ -129,38 +105,82 @@ export default function TestTable({ handleOpenModal }) {
     const createSortHandler = (property) => (event) => handleRequestSort(event, property);
 
     //?================================================================================
-    const dispatch = useDispatch(); 
+    const dispatch = useDispatch();
 
     const formatearFecha = (date) => {
         date = new Date(date)
         return date.toLocaleString()
     }
 
-    
+
     const handleChangeChecked = ({ target }, id) => {
-        if( !id ) {
-            if(target.checked){
-                dispatch(selectedAllTasks()) 
-            } 
-            if(!target.checked) 
-                dispatch(removeAllTasks())        
+        if (!id) {
+            if (target.checked) {
+                dispatch(selectedAllTasks())
+            }
+            if (!target.checked)
+                dispatch(removeAllTasks())
         }
-        else{
+        else {
             const isChecked = target.checked;
             dispatch(handleSelectedTask({ id, isChecked }))
-            
-        } 
+
+        }
+    }
+
+    const handleChangeCompleted = ({ target }, task) => {
+
+        if (target.checked) {
+            dispatch(updateTaskApi({
+                ...task,
+                completed: true
+            }))
+        }
+        else {
+            dispatch(updateTaskApi({
+                ...task,
+                completed: false
+            }))
+        }
+    }
+
+
+    const handleDeleteTask = () => {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: "No podrá volver a recuperar las tareas eliminadas",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, borrarlas!',
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteTaskAPI(tasksSelected))
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Eliminación correcta',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+            else {
+                dispatch(deselectedTasks())
+            }
+        })
     }
 
     //**** Funcion que deja seleccionada la fila si es checkeada
-    const isSelected = (id) =>  tasksSelected.some(task => task.id === id)
+    const isSelected = (id) => tasksSelected.some(task => task.id === id)
 
-    
+
     return (
         <Box>
             <Paper>
                 <Toolbar
-                    sx={{          
+                    sx={{
                         ...(tasksSelected.length > 0 && {
                             bgcolor: (theme) =>
                                 alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
@@ -174,7 +194,7 @@ export default function TestTable({ handleOpenModal }) {
                             variant="subtitle1"
                             component="div"
                         >
-                            Seleccionado: {tasksSelected.length} 
+                            Seleccionado: {tasksSelected.length}
                         </Typography>
                     ) : (
                         <Typography
@@ -188,8 +208,8 @@ export default function TestTable({ handleOpenModal }) {
                     )}
 
                     {tasksSelected.length > 0 ? (
-                        <Tooltip title="Delete">
-                            <IconButton>
+                        <Tooltip title="Eliminar">
+                            <IconButton onClick={handleDeleteTask}>
                                 <DeleteIcon />
                             </IconButton>
                         </Tooltip>
@@ -202,7 +222,7 @@ export default function TestTable({ handleOpenModal }) {
                     )}
                 </Toolbar>
 
-                
+
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -223,7 +243,7 @@ export default function TestTable({ handleOpenModal }) {
                                         }}
                                     />
                                 </TableCell>
-                                { headCells.map((headCell) => (
+                                {headCells.map((headCell) => (
                                     <TableCell
                                         key={headCell.id}
                                         align={headCell.numeric ? 'right' : 'left'}
@@ -244,6 +264,8 @@ export default function TestTable({ handleOpenModal }) {
                                         </TableSortLabel>
                                     </TableCell>
                                 ))}
+                                <TableCell align="center">¿Completada?</TableCell>
+                                <TableCell align="center">Editar</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -258,9 +280,9 @@ export default function TestTable({ handleOpenModal }) {
                                         onClick={(event) => handleClick(event, row.name)}
                                         role="checkbox"
                                         selected={isSelected(row.id)}
-                                        // tabIndex={-1}
-                                        // aria-checked={isSelected(row.id)}
-                                        // onChange={(e) => handleChangeChecked(e, row.id)}
+                                    // tabIndex={-1}
+                                    // aria-checked={isSelected(row.id)}
+                                    // onChange={(e) => handleChangeChecked(e, row.id)}
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
@@ -270,8 +292,8 @@ export default function TestTable({ handleOpenModal }) {
                                                 inputProps={{
                                                     'aria-labelledby': `enhanced-table-checkbox-${index}`,
                                                 }}
-                                                
-                                                // checked={tasksSelected.length === tasks.length && true}
+
+                                            // checked={tasksSelected.length === tasks.length && true}
                                             />
                                         </TableCell>
                                         <TableCell
@@ -283,14 +305,34 @@ export default function TestTable({ handleOpenModal }) {
                                         </TableCell>
                                         <TableCell align="right">{formatearFecha(row.createdAt)}</TableCell>
                                         <TableCell align="right">{formatearFecha(row.expirationDate)}</TableCell>
-                                        <TableCell align="right">{row.carbs}</TableCell>
-                                        <TableCell align="right">{row.protein}</TableCell>
+                                        <TableCell align="center">
+                                            <FormControlLabel
+                                                checked={row.completed ? true : false}
+                                                control={
+                                                    <Switch
+                                                        onChange={(e) => handleChangeCompleted(e, row)}
+                                                    />
+                                                }
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title="Editar Tarea" >
+                                                <IconButton
+                                                    onClick={() => handleOpenModal(row)}
+                                                >
+                                                    <BsPencilSquare
+                                                        style={{ cursor: 'pointer', color: '#1976d2' }}
+                                                        size={"1.5rem"}
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
                                     </TableRow>
-                                    
+
                                 )))
                             }
-                            
-                            { emptyRows > 0 && (
+
+                            {emptyRows > 0 && (
                                 <TableRow
                                     style={{
                                         height: (dense ? 33 : 53) * emptyRows,
@@ -298,10 +340,10 @@ export default function TestTable({ handleOpenModal }) {
                                 >
                                     <TableCell colSpan={6} />
                                 </TableRow>
-                            ) }
+                            )}
 
                         </TableBody>
-                        
+
                     </Table>
 
                 </TableContainer>
@@ -322,7 +364,7 @@ export default function TestTable({ handleOpenModal }) {
 
             </Paper>
 
-            
+
             <FormControlLabel
                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                 label="Dense padding"

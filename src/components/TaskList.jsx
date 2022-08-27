@@ -83,27 +83,17 @@ export const TaskList = () => {
             <header>
                 <h1>Cosas por Hacer</h1>
                 <ol>
-                    <li>Fusionar tabla haciendo retroingeniería</li>
+                    <li>Impedir que se reorganize tabla al completar tarea (???)</li>
+                    <li>Añadir color de vencimiento</li>
                     <li>Ver la posibilidad de páginar desde backend y frontend con tabla.</li>
                 </ol>
             </header>
-
-            <TestTable 
-                handleOpenModal={handleOpenModal}
-            />
-
-            <ExampleTable />
 
             <div>
                 <ActionButton
                     handleFunction={() => handleOpenModal(null)}
                     text={`Crear tarea`}
                     icon={`addTask`}
-                />
-                <ActionButton
-                    handleFunction={handleDeleteTask}
-                    text={'Eliminar Seleccionados'}
-                    icon={`deleteTask`}
                 />
 
                 <Button
@@ -132,6 +122,19 @@ export const TaskList = () => {
                     <MenuItem onClick={() => handleOrderMenu('order4')}>Descripción</MenuItem>
                 </Menu>
             </div>
+
+
+
+
+
+
+            <TestTable 
+                handleOpenModal={handleOpenModal}
+            />
+
+            {/* <ExampleTable /> */}
+
+           
 
 
 
