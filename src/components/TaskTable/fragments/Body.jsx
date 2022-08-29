@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Checkbox, FormControlLabel, IconButton, Switch, TableBody, TableCell, TableRow, Tooltip } from "@mui/material"
-import { compareDate } from '../../../helpers/dateTimes';
+import { checkDate, compareDate } from '../../../helpers/dateTimes';
 import { BsPencilSquare } from 'react-icons/bs'
 import { updateTaskApi } from '../../../store/features/tasks/thunks';
 
@@ -89,12 +89,15 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
                         selected={isSelected(row.id)}
                         style={{
                             backgroundColor:
+                                checkDate(row.expirationDate) 
+                                ? '#E3E3E3' :
                                 compareDate(row.createdAt, row.expirationDate) <= 0
                                     ? '#FFE5E5' :
                                 (compareDate(row.createdAt, row.expirationDate) > 0 && compareDate(row.createdAt, row.expirationDate) <= 3)
                                     ? '#FFF8DB' : 
                                 '#F0FFDD',
-                            borderRadius: '20px'
+                            borderRadius: '20px',
+                            textDecoration: checkDate(row.expirationDate) && 'line-through'
                         }}
                     >
                         <TableCell padding="checkbox">
@@ -117,7 +120,10 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
                         <TableCell align="right">{dateFormat(row.expirationDate)}</TableCell>
                         <TableCell align="center">
                             <FormControlLabel
-                                checked={row.completed ? true : false}
+                                disabled={checkDate(row.expirationDate) ? true: false}
+                                checked={
+                                    row.completed ? true : false
+                                }
                                 control={
                                     <Switch
                                         onChange={(e) => handleChangeCompleted(e, row)}
@@ -128,6 +134,7 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
                         <TableCell align="center">
                             <Tooltip title="Editar Tarea" >
                                 <IconButton
+                                    
                                     onClick={() => handleOpenModal(row)}
                                 >
                                     <BsPencilSquare

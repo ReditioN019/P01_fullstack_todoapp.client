@@ -55,8 +55,7 @@ export const taskSlice = createSlice({
             }
             if (option === 'expiredTasks'){
                 state.filterTask = state.tasks.filter(task => {
-                    const expiratedTask = checkDate(task.expirationDate)
-                    console.log(expiratedTask)
+                    const expiratedTask = checkDate(task.expirationDate);
                     if(expiratedTask){
                         return state.filterTask = task
                     }
