@@ -23,7 +23,7 @@ const getComparator = (order, orderBy) => {
 
 export const Body = ({ handleChangeChecked, handleOpenModal}) => {
 
-    const { tasks, tasksSelected } = useSelector(state => state.tasks);
+    const { tasks, tasksSelected, filtered, filterTask } = useSelector(state => state.tasks);
     const { order, orderBy, page, rowsPerPage } = useSelector(state => state.taskTable)
     const dispatch = useDispatch();
 
@@ -71,12 +71,14 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
 
     const dateFormat = (date) => {
         date = new Date(date)
-        return date.toLocaleString()
+        return date.toLocaleString();
     }
+
+    const items = filtered ? filterTask : tasks;
 
     return (
         <TableBody>
-            {tasks.slice().sort(getComparator(order, orderBy))
+            { items.slice().sort(getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => ((
                     <TableRow
@@ -89,8 +91,9 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
                             backgroundColor:
                                 compareDate(row.createdAt, row.expirationDate) <= 0
                                     ? '#FFE5E5' :
-                                    (compareDate(row.createdAt, row.expirationDate) > 0 && compareDate(row.createdAt, row.expirationDate) <= 3)
-                                        ? '#FFF8DB' : '#F0FFDD',
+                                (compareDate(row.createdAt, row.expirationDate) > 0 && compareDate(row.createdAt, row.expirationDate) <= 3)
+                                    ? '#FFF8DB' : 
+                                '#F0FFDD',
                             borderRadius: '20px'
                         }}
                     >

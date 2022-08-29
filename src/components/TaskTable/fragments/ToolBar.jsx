@@ -2,18 +2,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import { deleteTaskAPI } from '../../../store/features/tasks/thunks';
 import { deselectedTasks } from '../../../store/features/tasks/taskSlice';
 import Swal from 'sweetalert2'
-import { IoMdAddCircle} from 'react-icons/io';
+import { IoMdAddCircle } from 'react-icons/io';
 import { Toolbar, Typography, IconButton, Tooltip} from '@mui/material'
-import FilterListIcon from '@mui/icons-material/FilterList';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { alpha } from '@mui/material/styles';
+import { FilterButton } from './FilterButton';
 
-export const ToolBar = ({onHanldeOpenModal}) => {
+export const ToolBar = ({ onHanldeOpenModal }) => {
 
     const { tasksSelected } = useSelector(state => state.tasks);
     const dispatch = useDispatch();
 
-    
+
     const handleDeleteTask = () => {
         Swal.fire({
             title: '¿Está seguro?',
@@ -35,7 +35,7 @@ export const ToolBar = ({onHanldeOpenModal}) => {
                     timer: 1500
                 })
             }
-            else dispatch(deselectedTasks())     
+            else dispatch(deselectedTasks())
         })
     }
 
@@ -45,7 +45,7 @@ export const ToolBar = ({onHanldeOpenModal}) => {
                 ...(tasksSelected.length > 0 && {
                     bgcolor: (theme) =>
                         alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                }),
+                })
             }}
         >
             {tasksSelected.length > 0 ? (
@@ -75,10 +75,11 @@ export const ToolBar = ({onHanldeOpenModal}) => {
                     </IconButton>
                 </Tooltip>
                 :
-                <>
+                <div style={{ display: 'flex' }}>
                     <Tooltip title="Agregar tarea">
                         <IconButton
-                            style={{ padding: '0', marginRight: '2rem' }}
+                            style={{ padding: '0' }}
+                            sx={{ mr: 4 }}
                             onClick={() => onHanldeOpenModal(null)}
                         >
                             <IoMdAddCircle
@@ -86,12 +87,10 @@ export const ToolBar = ({onHanldeOpenModal}) => {
                             />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Filter list">
-                        <IconButton>
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
+                    
+                    <FilterButton />
+                    
+                </div>
             }
         </Toolbar>
     )

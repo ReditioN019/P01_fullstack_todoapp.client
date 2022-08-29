@@ -4,7 +4,7 @@ const initialState = {
     order: 'asc', //por defecto estará en order ascendente
     orderBy: 'description', //la columna especificada estara ordenada de forma asc
     page: 0, //número de páginas inicial
-    rowsPerPage: 5 //filas por página
+    rowsPerPage: 5, //filas por página
 }
 
 const tableSlice = createSlice({
@@ -24,7 +24,7 @@ const tableSlice = createSlice({
         },
         changePage: (state, action) => {
             state.page = action.payload
-        }
+        },
     }
 });
 

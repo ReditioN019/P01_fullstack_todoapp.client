@@ -15,6 +15,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
     const { description, expirationDate } = inputs;
 
     const handleAddTask = () => {
+        
         dispatch(addTaskAPI({
             ...inputs,
             expirationDate: dateFormatForSaveInDB(expirationDate)
@@ -105,7 +106,6 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                 <div style={{ marginTop: '2rem' }}>
                     <Button
                         onClick={() => dispatch(changeOpenModal(!openModal))}
-
                     >Cancelar</Button>
 
                     <Button

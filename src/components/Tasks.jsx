@@ -6,7 +6,7 @@ import { useForm } from '../hooks/useForm';
 import { TaskModal } from './TaskModal';
 import { Container } from '@mui/system';
 
-export const TaskList = () => {
+export const Tasks = () => {
 
     const { handleChange, handleReset, inputs, setInputs } = useForm({
         id: '',
@@ -28,12 +28,8 @@ export const TaskList = () => {
             <header>
                 <h1>Cosas por Hacer</h1>
                 <ol>
-                    <li>VOLVER A REVISAR CÓDIGO DE TABLA A PROFUNDIDAD Y OPTIMIZAR</li>
-                    <li>Estoy casi seguro que si uso redux, mejor reemplazar el useState y poner estados en un slice</li>
-                    <li>Añadir buscador de tareas (despues de tener código ordenado)</li>
+                    <li>SUBIR A GITHUB Y DESPLEGAR. DESPUES SE PUEDE MEJORAR(?)</li>
                     <li>Arreglar que cuando creo una tarea que quede color verde. Al pasar fecha donde deba cambiar a amarillo no lo hace</li>
-                    <li>Validar descripción de tarea que ya existe</li>
-                    <li>Cuando creo una tarea y queda color veder, despues la actualizo a hoy por ej, sigue verder</li>
                 </ol>
             </header>
 
