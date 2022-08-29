@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Checkbox, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material'
-import { handleChangeOrder } from '../../../store/features/table/tableSlice';
+import { changeOrder } from '../../../store/features/table/tableSlice';
 
 //TODO: Esto es lo que va en la primera fila de la tabla
 const headCells = [
@@ -34,12 +34,12 @@ export const Head = ({ handleChangeChecked }) => {
 
     const { tasks, tasksSelected } = useSelector(state => state.tasks);
     const { order, orderBy } = useSelector(state => state.taskTable);
-    
+
     const dispatch = useDispatch();
 
     const createSortHandler = (property) => () => handleRequestSort(property);
 
-    const handleRequestSort = (property) => dispatch(handleChangeOrder(property));
+    const handleRequestSort = (property) => dispatch(changeOrder(property));
 
 
 

@@ -10,31 +10,18 @@ export const taskSlice = createSlice({
     initialState,
     reducers:{
         getTasks: (state, action) => {
-            state.tasks  = action.payload.tasks.sort((a, b) => {
-                return ( a.expirationDate > b.expirationDate) ? 1 : -1
-            })
-            // .sort((a,b) => {
-                // return (a.completed > b.completed) ? 1 : -1
-            // })
-            // for(let x in a)
-            // a[x].completed === true  ? a.push( a.splice(x,1)[0] )  : 0;
-
-        },
-        addTask: (state, action) => {      
-        },
-        updateTask: (state, action) => {
-            state.tasks = state.tasks.filter( task => task.id !== action.payload)
+            state.tasks = action.payload.tasks;
         },
         deleteTask: (state, action) => {
             state.tasks = state.tasks.filter( task => task.id !== action.payload )
             state.tasksSelected = [];
         },
-        handleSelectedTask: (state, action) => {
+        selectedTask: (state, action) => {
             const { id, isChecked } = action.payload   
 
-            isChecked 
-            ? state.tasksSelected.push(action.payload) 
-            : state.tasksSelected = state.tasksSelected.filter(task => task.id !== id)
+            if(isChecked) state.tasksSelected.push(action.payload); 
+            else
+                state.tasksSelected = state.tasksSelected.filter(task => task.id !== id);
         },
         selectedAllTasks: (state, action) => {;
             state.tasksSelected = []
@@ -54,5 +41,5 @@ export const taskSlice = createSlice({
     }
 })
 
-export const { getTasks, addTask, deleteTask, updateTask, changeOpenModal, changeEditCreate, handleSelectedTask, selectedAllTasks,removeAllTasks, deselectedTasks } = taskSlice.actions  
+export const { getTasks, deleteTask, changeOpenModal, changeEditCreate, selectedTask, selectedAllTasks,removeAllTasks, deselectedTasks } = taskSlice.actions  
 export default taskSlice.reducer

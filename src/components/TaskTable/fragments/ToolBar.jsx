@@ -35,9 +35,7 @@ export const ToolBar = ({onHanldeOpenModal}) => {
                     timer: 1500
                 })
             }
-            else {
-                dispatch(deselectedTasks())
-            }
+            else dispatch(deselectedTasks())     
         })
     }
 

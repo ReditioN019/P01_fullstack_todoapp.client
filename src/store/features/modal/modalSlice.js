@@ -5,7 +5,7 @@ const initialState = {
     inEdit: null, //es para saber si se está editando o creando una tarea
 }
 
-export const actionSlice = createSlice({
+export const modalSlice = createSlice({
     name: 'actions',
     initialState,
     reducers:{
@@ -18,5 +18,5 @@ export const actionSlice = createSlice({
     }
 })
 
-export const { changeOpenModal, changeEditCreate } = actionSlice.actions  
-export default actionSlice.reducer
+export const { changeOpenModal, changeEditCreate } = modalSlice.actions  
+export default modalSlice.reducer

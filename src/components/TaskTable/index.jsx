@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { handleSelectedTask, removeAllTasks, selectedAllTasks } from '../../store/features/tasks/taskSlice';
-import { changeEditCreate, changeOpenModal } from '../../store/features/actions/actionSlice';
+import { selectedTask, removeAllTasks, selectedAllTasks } from '../../store/features/tasks/taskSlice';
+import { changeEditCreate, changeOpenModal } from '../../store/features/modal/modalSlice';
 import { ToolBar, Head, Body } from './fragments'
 import { Box, Table, TableContainer, TablePagination, Paper } from '@mui/material'
 import { changePage, changeRowsPerPage } from '../../store/features/table/tableSlice';
@@ -11,7 +11,7 @@ export const TaskTable = ({ handleReset, setInputs }) => {
 
     const { tasks } = useSelector(state => state.tasks);
     const { page, rowsPerPage } = useSelector(state => state.taskTable);
-    const { openModal } = useSelector(state => state.actions);
+    const { openModal } = useSelector(state => state.modals);
     
     const dispatch = useDispatch();
 
@@ -32,8 +32,7 @@ export const TaskTable = ({ handleReset, setInputs }) => {
         }
         else {
             const isChecked = target.checked;
-            dispatch(handleSelectedTask({ id, isChecked }))
-
+            dispatch(selectedTask({ id, isChecked }))
         }
     }
 

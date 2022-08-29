@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { modalStyles } from '../styles/styles';
 import { checkDate, dateFormatForSaveInDB } from '../helpers/dateTimes';
 import { addTaskAPI, updateTaskApi } from '../store/features/tasks/thunks';
-import { changeOpenModal } from '../store/features/actions/actionSlice';
+import { changeOpenModal } from '../store/features/modal/modalSlice';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 
 export const TaskModal = ({ handleChange, inputs, setInputs }) => {
 
-    const { openModal, inEdit } = useSelector(state => state.actions);
+    const { openModal, inEdit } = useSelector(state => state.modals);
     const dispatch = useDispatch();
 
     const { description, expirationDate } = inputs;
@@ -63,14 +63,13 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                             && true
                         }
                         fullWidth
-                        id="outlined-multiline-static"
-                        margin="dense"
                         label="Descripción"
-                        variant="standard"
+                        variant="outlined"
+                        color='success'
                         name="description"
+                        value={description}
                         type="text"
                         onChange={handleChange}
-                        value={description}
                         sx={{ marginTop: 1 }}
                         helperText={ 
                             (description.length >= 1 && description.length < 5 ) 
@@ -87,6 +86,7 @@ export const TaskModal = ({ handleChange, inputs, setInputs }) => {
                     renderInput={(params) =>
                         <TextField
                             fullWidth
+                            color='success'
                             type="datetime"
                             sx={{ marginTop: 3 }}
                             {...params}

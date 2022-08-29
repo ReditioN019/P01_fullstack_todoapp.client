@@ -1,5 +1,5 @@
 import { taskApi } from "../../../api/taskApi";
-import { getTasks, addTask, deleteTask, updateTask } from "./taskSlice"
+import { getTasks, deleteTask } from "./taskSlice"
 
 
 export const getTasksAPI = () => {
@@ -16,9 +16,7 @@ export const addTaskAPI = newTask => {
         await taskApi.post('',{
             description: newTask.description,
             expirationDate: newTask.expirationDate
-        })
-        .then((response) => {
-            dispatch(addTask(newTask));
+        }).then((response) => {
             dispatch(getTasksAPI())
         })
     }
@@ -32,9 +30,7 @@ export const updateTaskApi = task => {
             expirationDate: task.expirationDate,
             completed: task.completed,
             isChecked: task.isChecked
-        })
-        .then((response) =>{
-            dispatch(updateTask(task))  
+        }).then((response) =>{
             dispatch(getTasksAPI())           
         }) 
     }

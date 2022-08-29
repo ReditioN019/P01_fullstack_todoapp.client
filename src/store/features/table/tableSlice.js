@@ -11,7 +11,7 @@ const tableSlice = createSlice({
     name: 'table',
     initialState,
     reducers: {
-        handleChangeOrder: (state, action) => {
+        changeOrder: (state, action) => {
             const isAsc = state.orderBy === action.payload && state.order === 'asc';
             state.order = (isAsc) ? 'desc' : 'asc';
             state.orderBy = action.payload
@@ -28,6 +28,6 @@ const tableSlice = createSlice({
     }
 });
 
-export const { handleChangeOrder, changeRowsPerPage, changePage } = tableSlice.actions
+export const { changeOrder, changeRowsPerPage, changePage } = tableSlice.actions
 
 export default tableSlice.reducer
