@@ -26,11 +26,7 @@ export const Tasks = () => {
     return (
         <Container maxWidth="md">
             <header>
-                <h1>Cosas por Hacer</h1>
-                <ol>
-                    <li>SUBIR A GITHUB Y DESPLEGAR. DESPUES SE PUEDE MEJORAR(?)</li>
-                    <li>Arreglar que cuando creo una tarea que quede color verde. Al pasar fecha donde deba cambiar a amarillo no lo hace</li>
-                </ol>
+                <h1>Cosas por Hacer</h1> 
             </header>
 
   

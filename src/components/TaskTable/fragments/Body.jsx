@@ -134,7 +134,6 @@ export const Body = ({ handleChangeChecked, handleOpenModal}) => {
                         <TableCell align="center">
                             <Tooltip title="Editar Tarea" >
                                 <IconButton
-                                    
                                     onClick={() => handleOpenModal(row)}
                                 >
                                     <BsPencilSquare

@@ -45,7 +45,7 @@ export const FilterButton = () => {
                 </div>
                 <div onClick={() => dispatch(filterTask('expiredTasks'))}>
                     <MenuItem onClick={handleClose}>
-                        Vencidas
+                        Expiradas
                     </MenuItem>
                 </div>
             </Menu>
